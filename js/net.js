@@ -1,7 +1,7 @@
 // 과녁 <-> 도끼 연동 레이어.
 // - firebase: Realtime Database (서로 다른 기기 간 연동)
 // - local:    BroadcastChannel (같은 브라우저의 탭끼리, Firebase 설정 전 테스트용)
-import { firebaseConfig } from './firebase-config.js';
+import { firebaseConfig } from './firebase-config.js?v=3';
 
 const ROOT = 'axeRooms'; // DB 최상위 경로 (다른 게임의 rooms 와 분리)
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2';

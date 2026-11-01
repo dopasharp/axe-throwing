@@ -1,5 +1,5 @@
-import { mode, makeRoomId, normalizeRoomId, hostRoom } from './net.js';
-import * as S from './sound.js';
+import { mode, makeRoomId, normalizeRoomId, hostRoom } from './net.js?v=3';
+import * as S from './sound.js?v=3';
 
 const PER_ROUND = 5;
 const $ = (id) => document.getElementById(id);
@@ -387,7 +387,8 @@ async function openRoom(id) {
   btn.disabled = true;
   btn.textContent = '방 만드는 중…';
   try {
-    net = await hostRoom(id, { onAxe, onThrow });
+    const slow = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 12000));
+    net = await Promise.race([hostRoom(id, { onAxe, onThrow }), slow]);
     roomId = id;
     publish();
     showRoomQr(id);
@@ -406,6 +407,7 @@ $('createBtn').addEventListener('click', () => {
   S.ding(2);
   openRoom(makeRoomId());
 });
+window.__targetReady = true;
 
 renderHud();
 const reopen = normalizeRoomId(new URLSearchParams(location.search).get('room'));

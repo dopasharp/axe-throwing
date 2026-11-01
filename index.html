@@ -9,9 +9,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script type="module" src="js/target.js"></script>
+  <script type="module" src="js/target.js?v=3"></script>
+  <script>
+    // 게임 스크립트가 아직 안 붙었거나 실패했을 때 버튼이 먹통처럼 보이지 않게 안내
+    document.addEventListener('click', function (e) {
+      if (window.__targetReady || !e.target.closest || !e.target.closest('#createBtn')) return;
+      document.getElementById('lobbyError').textContent = '게임을 불러오지 못했어요. 페이지를 새로고침해 주세요.';
+    });
+  </script>
 </head>
 <body class="target-page">
   <div class="wall">
