@@ -10,7 +10,7 @@ const els = {
   target: $('target'), stuck: $('stuck'), fly: $('flyLayer'), banner: $('banner'),
   total: $('total'), throwsLeft: $('throwsLeft'),
   axeDot: $('axeDot'), axeText: $('axeText'),
-  qrOverlay: $('qrOverlay'), roundOverlay: $('roundOverlay'),
+  qrOverlay: $('qrOverlay'),
 };
 
 // ------------------------------------------------------------------ 방 & QR
@@ -75,7 +75,7 @@ function newRound() {
   els.stuck.querySelectorAll('.stuck-axe, .slit').forEach((n) => {
     n.animate([{ opacity: 1 }, { opacity: 0, transform: 'translate(-50%, 40%)' }], { duration: 300 }).finished.then(() => n.remove());
   });
-  els.roundOverlay.classList.remove('show');
+  window.DopaSharp?.close();
   renderHud();
   publish();
 }
@@ -87,11 +87,17 @@ function endRound() {
     best = game.total;
     try { localStorage.setItem('axe-best', String(best)); } catch {}
   }
-  $('roundTotal').textContent = game.total;
-  $('roundScores').innerHTML = game.scores.map((s) => `<span>${s}</span>`).join('');
-  $('bestText').textContent = isBest ? '🏆 최고 기록 갱신!' : `최고 기록 ${best}점`;
+  window.DopaSharp?.track('game_complete', { score: game.total, best: isBest });
   setTimeout(() => {
-    els.roundOverlay.classList.add('show');
+    window.DopaSharp?.showResult({
+      art: isBest ? '🏆' : '🎯',
+      title: isBest ? '최고 기록 갱신!' : '라운드 종료!',
+      stat: `${game.total}점`,
+      detail: `${game.scores.join(' · ')} — 최고 기록 ${best}점. 도끼 폰에서 다시 던져도 새 라운드가 시작돼요.`,
+      shareText: `🪓 도끼 던지기 — ${PER_ROUND}번 던져서 ${game.total}점!`,
+      retryLabel: '다시 하기',
+      onRetry: newRound,
+    });
     if (isBest) S.fanfare();
   }, 900);
 }
@@ -298,6 +304,7 @@ function onThrow(id, data) {
 
 async function handleThrow(id, data) {
   if (game.roundOver) newRound();
+  if (game.thrown === 0) window.DopaSharp?.track('game_start');
   els.qrOverlay.classList.remove('show');
   const emoji = typeof data.emoji === 'string' && data.emoji.length <= 8 ? data.emoji : '🪓';
   const hit = computeHit(data);
@@ -379,7 +386,6 @@ document.addEventListener('pointerdown', unlock, { capture: true });
 $('soundBtn').addEventListener('click', () => { unlock(); S.ding(3); });
 $('qrBtn').addEventListener('click', () => els.qrOverlay.classList.add('show'));
 $('closeQr').addEventListener('click', () => els.qrOverlay.classList.remove('show'));
-$('againBtn').addEventListener('click', newRound);
 
 // ------------------------------------------------------------------ 방 만들기
 async function openRoom(id) {
@@ -398,7 +404,7 @@ async function openRoom(id) {
     console.error(e);
     $('lobbyError').textContent = '방을 만들지 못했어요. 인터넷 연결을 확인하고 다시 시도하세요.';
     btn.disabled = false;
-    btn.textContent = '🎯 과녁 방 만들기';
+    btn.textContent = '게임 시작하기';
   }
 }
 

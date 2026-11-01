@@ -3,15 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#1a110a">
-  <title>도끼 던지기 · 과녁</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <meta name="theme-color" content="#0B0E0D">
+  <title>도끼 던지기 | DOPA#</title>
+  <meta name="dopasharp:game" content="axe-throwing">
+  <link rel="canonical" href="https://dopasharp.github.io/axe-throwing/">
+  <meta name="description" content="휴대폰 두 대로 하는 도끼 던지기. 한 대는 과녁, 한 대는 도끼가 되어 휘둘러 던지는 인터랙티브 웹게임.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="DOPASHARP">
+  <meta property="og:title" content="도끼 던지기 🪓">
+  <meta property="og:description" content="휴대폰을 휘둘러 과녁에 도끼를 꽂아보세요. 5번 던져 최고 기록 도전!">
+  <meta property="og:url" content="https://dopasharp.github.io/axe-throwing/">
+  <meta property="og:image" content="https://dopasharp.github.io/axe-throwing/og/axe.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="dopasharp/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="dopasharp/tokens.css">
+  <link rel="stylesheet" href="dopasharp/components.css">
+  <link rel="stylesheet" href="css/style.css?v=5">
+  <script src="dopasharp/dopasharp.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script type="module" src="js/target.js?v=4"></script>
+  <script type="module" src="js/target.js?v=5"></script>
   <script>
     // 게임 스크립트가 아직 안 붙었거나 실패했을 때 버튼이 먹통처럼 보이지 않게 안내
     document.addEventListener('click', function (e) {
@@ -78,22 +95,29 @@
   <div id="flyLayer" class="fly-layer"></div>
   <div id="banner" class="banner"></div>
 
-  <section id="lobby" class="overlay show">
+  <section id="lobby" class="overlay show lobby">
+    <header data-dopa="header"></header>
     <div class="card">
-      <div class="hero-emoji">🎯</div>
-      <h1>도끼 던지기</h1>
-      <p>휴대폰 두 대로 하는 도끼 던지기<br>이 폰이 <b>과녁</b>이 돼요</p>
-      <button id="createBtn" class="btn">🎯 과녁 방 만들기</button>
-      <a class="btn ghost" href="axe.html">🪓 코드로 도끼 참가</a>
-      <p class="warn">1. 과녁 방 만들기 → 2. 다른 폰으로 QR 스캔<br>3. 도끼 폰을 휘둘러 던지기!</p>
-      <p id="lobbyError" class="error"></p>
+      <span class="dopa-label">TWO-PHONE INTERACTIVE GAME</span>
+      <div class="hero-emoji" aria-hidden="true">🎯</div>
+      <h1>도끼 던지기 🪓</h1>
+      <p>휴대폰 두 대로 하는 도끼 던지기.<br>이 폰이 <b>과녁</b>이 돼요.</p>
+      <ol class="steps">
+        <li><span><b>방 만들기</b> 이 휴대폰이 과녁이 돼요.</span></li>
+        <li><span><b>QR 스캔</b> 다른 휴대폰으로 찍으면 도끼가 돼요.</span></li>
+        <li><span><b>휘둘러 던지기</b> 5번 던져 최고 기록에 도전!</span></li>
+      </ol>
+      <button id="createBtn" class="btn">게임 시작하기</button>
+      <a class="btn ghost" href="axe.html">코드로 도끼 참가</a>
+      <p id="lobbyError" class="error" role="alert"></p>
     </div>
+    <footer data-dopa="footer"></footer>
   </section>
 
   <section id="qrOverlay" class="overlay">
     <div class="card">
-      <h1>🪓 도끼 던지기</h1>
-      <p>도끼가 될 휴대폰으로<br><b>QR 코드를 스캔</b>하세요</p>
+      <span class="dopa-label">GAME 005 / AXE</span>
+      <h2>도끼가 될 휴대폰으로<br>QR 코드를 스캔하세요</h2>
       <div id="qr" class="qr"></div>
       <div class="code">방 코드<b id="roomCode2">-----</b></div>
       <a id="axeLink" class="link" target="_blank" rel="noopener">도끼 링크</a>
@@ -102,15 +126,5 @@
     </div>
   </section>
 
-  <section id="roundOverlay" class="overlay">
-    <div class="card">
-      <h2>라운드 종료!</h2>
-      <div class="big-total"><span id="roundTotal">0</span>점</div>
-      <div id="roundScores" class="scores"></div>
-      <p id="bestText"></p>
-      <button id="againBtn" class="btn">🪓 다시 하기</button>
-      <p class="warn">도끼 폰에서 다시 던져도 새 라운드가 시작돼요</p>
-    </div>
-  </section>
 </body>
 </html>

@@ -1,13 +1,15 @@
+/* Axe throwing = DOPA# charcoal + lime. Only the wooden target keeps its warm colors.
+   Brand values come from dopasharp/tokens.css; Black Han Sans stays for the comic score pops. */
 :root {
-  --bg: #1a110a;
-  --ink: #fbf3e6;
-  --muted: #cdb79c;
-  --accent: #ff7a1a;
-  --accent-2: #ffc23d;
+  --bg: var(--color-bg);
+  --ink: var(--color-text);
+  --muted: var(--color-text-muted);
+  --accent: var(--color-brand);
+  --accent-2: var(--color-brand);
   --red: #e5383b;
-  --ok: #3ddc84;
-  --card: rgba(30, 19, 11, 0.92);
-  --line: rgba(255, 226, 190, 0.16);
+  --ok: var(--color-mint);
+  --card: rgba(21, 25, 26, 0.94);
+  --line: var(--color-border);
   --T: min(88vw, 60vh, 560px);
   --display: 'Black Han Sans', system-ui, sans-serif;
   color-scheme: dark;
@@ -20,7 +22,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--font-body);
   overflow: hidden;
   overscroll-behavior: none;
   user-select: none;
@@ -36,25 +38,29 @@ button { font: inherit; color: inherit; cursor: pointer; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 52px;
-  padding: 0 22px;
-  border: 0;
-  border-radius: 16px;
-  background: linear-gradient(180deg, var(--accent-2), var(--accent));
-  color: #2a1406;
-  font-weight: 800;
-  font-size: 17px;
-  box-shadow: 0 6px 0 #a3420a, 0 10px 24px rgba(0, 0, 0, 0.4);
-  transition: transform 0.08s, box-shadow 0.08s;
+  min-height: var(--button-height);
+  padding: 12px 24px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font: 700 16px/1.3 var(--font-body);
+  transition: background var(--duration-normal), transform var(--duration-fast) var(--ease-standard);
 }
 a.btn { text-decoration: none; }
-.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #a3420a, 0 4px 10px rgba(0, 0, 0, 0.4); }
+.btn:hover { background: var(--color-brand-hover); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn.ghost {
   background: transparent;
-  color: var(--muted);
-  box-shadow: inset 0 0 0 1.5px var(--line);
+  color: var(--ink);
+  border-color: var(--line);
 }
-.btn.ghost:active { transform: translateY(1px); }
+.btn.ghost:hover { background: #ffffff0f; border-color: var(--muted); }
+.btn:focus-visible, .icon-btn:focus-visible, .seg button:focus-visible, .emoji-grid button:focus-visible, .link:focus-visible {
+  outline: 3px solid var(--color-text);
+  outline-offset: 3px;
+}
 
 .icon-btn {
   width: 44px;
@@ -72,7 +78,7 @@ a.btn { text-decoration: none; }
   display: inline-block;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(255, 194, 61, 0.18);
+  background: rgba(217, 255, 68, 0.14);
   color: var(--accent-2);
   font-size: 11px;
   font-weight: 700;
@@ -80,7 +86,7 @@ a.btn { text-decoration: none; }
 
 .dot { width: 9px; height: 9px; border-radius: 50%; background: #777; display: inline-block; flex: none; }
 .dot.on { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
-.dot.off { background: #c9a27a; animation: blink 1.2s infinite; }
+.dot.off { background: #f5c96b; animation: blink 1.2s infinite; }
 @keyframes blink { 50% { opacity: 0.25; } }
 
 /* ------------------------------------------------------------ 공통 오버레이 */
@@ -91,7 +97,7 @@ a.btn { text-decoration: none; }
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(10, 6, 3, 0.72);
+  background: rgba(11, 14, 13, 0.78);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   opacity: 0;
@@ -112,11 +118,31 @@ a.btn { text-decoration: none; }
   align-items: center;
   gap: 12px;
 }
-.card h1, .card h2 { margin: 0; font-family: var(--display); font-weight: 400; letter-spacing: 0.5px; }
-.card h1 { font-size: 32px; }
-.card h2 { font-size: 26px; }
-.card p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 15px; }
+.card h1, .card h2 { margin: 0; font-family: var(--font-body); font-weight: 800; letter-spacing: -0.02em; line-height: var(--leading-tight); }
+.card h1 { font-size: var(--text-h1); }
+.card h2 { font-size: 22px; line-height: 1.35; }
+.card p { margin: 0; color: var(--muted); line-height: var(--leading-body); font-size: 15px; }
+.card p b { color: var(--ink); }
 .card .btn { width: 100%; }
+.card .dopa-label { color: var(--color-brand); }
+
+/* 시작 화면: D# 헤더 · 카드 · 푸터 */
+.lobby, .screen.framed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: max(12px, env(safe-area-inset-top)) 20px 0;
+  overflow-y: auto;
+}
+.lobby { background: rgba(11, 14, 13, 0.9); }
+.lobby > .dopa-header, .screen.framed > .dopa-header { width: 100%; max-width: 560px; }
+.lobby .hero-emoji { font-size: 64px; }
+.steps { list-style: none; counter-reset: step; margin: 0 0 4px; padding: 0; display: grid; gap: 8px; width: 100%; text-align: left; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 24px 1fr; gap: 10px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--color-surface-raised); color: var(--color-brand); font: 800 12px/1 var(--font-body); }
+.steps b { color: var(--ink); }
 
 /* ================================================================ 과녁 페이지 */
 .target-page .wall {
@@ -125,10 +151,10 @@ a.btn { text-decoration: none; }
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 48%, rgba(255, 200, 130, 0.28), transparent 70%),
+    radial-gradient(ellipse 70% 55% at 50% 48%, rgba(247, 246, 242, 0.14), transparent 70%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 25%, transparent 70%, rgba(0, 0, 0, 0.6)),
-    repeating-linear-gradient(90deg, rgba(20, 10, 4, 0.75) 0 3px, transparent 3px 92px),
-    repeating-linear-gradient(90deg, #5a371d 0 92px, #66421f 92px 184px, #523018 184px 276px, #6c4625 276px 368px);
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0 3px, transparent 3px 92px),
+    repeating-linear-gradient(90deg, #1b2120 0 92px, #202726 92px 184px, #181d1c 184px 276px, #222928 276px 368px);
 }
 
 .target-page .hud {
@@ -141,7 +167,7 @@ a.btn { text-decoration: none; }
 .hud-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .room { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
 .room b { color: var(--ink); font-size: 16px; letter-spacing: 3px; }
-.hud-score { font-family: var(--display); font-size: 44px; line-height: 1; text-shadow: 0 3px 0 #000; }
+.hud-score { font: 900 48px/1 var(--font-body); color: var(--color-brand); font-variant-numeric: tabular-nums; text-shadow: 0 3px 0 #000; }
 .hud-score small { font-size: 18px; margin-left: 2px; color: var(--muted); }
 
 .throws-left { display: flex; justify-content: center; gap: 6px; font-size: 22px; min-height: 30px; }
@@ -238,8 +264,8 @@ a.btn { text-decoration: none; }
   font-size: min(16vw, 92px);
   white-space: nowrap;
   color: var(--accent-2);
-  -webkit-text-stroke: 3px #3a1700;
-  text-shadow: 0 8px 0 #3a1700, 0 0 40px rgba(255, 122, 26, 0.8);
+  -webkit-text-stroke: 3px var(--color-on-brand);
+  text-shadow: 0 8px 0 var(--color-on-brand), 0 0 40px rgba(217, 255, 68, 0.6);
   transform: translate(-50%, -50%) scale(0);
   opacity: 0;
 }
@@ -273,18 +299,9 @@ a.btn { text-decoration: none; }
 .code b { color: var(--ink); font-size: 26px; letter-spacing: 6px; margin-left: 6px; font-family: ui-monospace, monospace; }
 .link { color: var(--accent-2); font-size: 13px; word-break: break-all; }
 
-.scores { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-.scores span {
-  min-width: 40px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  font-weight: 800;
-}
-.big-total { font-family: var(--display); font-size: 64px; line-height: 1; color: var(--accent-2); }
 
 /* ================================================================ 도끼 페이지 */
-.axe-page { background: radial-gradient(ellipse at 50% 30%, #3a2413, var(--bg) 70%); }
+.axe-page { background: radial-gradient(ellipse at 50% 30%, #202726, var(--bg) 70%); }
 
 .screen {
   position: fixed;
@@ -326,7 +343,7 @@ a.btn { text-decoration: none; }
   justify-content: space-between;
   gap: 10px;
 }
-.axe-hud .score { font-family: var(--display); font-size: 34px; line-height: 1; }
+.axe-hud .score { font: 900 36px/1 var(--font-body); color: var(--color-brand); font-variant-numeric: tabular-nums; }
 .axe-hud .score small { font-size: 15px; color: var(--muted); margin-left: 2px; }
 .axe-hud .meta { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
 .axe-hud .meta b { color: var(--ink); letter-spacing: 2px; }
@@ -383,7 +400,7 @@ a.btn { text-decoration: none; }
   opacity: 0;
 }
 .result.show { animation: result 1.6s ease forwards; }
-.result .pts { font-family: var(--display); font-size: min(30vw, 150px); line-height: 1; color: var(--accent-2); -webkit-text-stroke: 3px #3a1700; text-shadow: 0 6px 0 #3a1700; }
+.result .pts { font-family: var(--display); font-size: min(30vw, 150px); line-height: 1; color: var(--accent-2); -webkit-text-stroke: 3px var(--color-on-brand); text-shadow: 0 6px 0 var(--color-on-brand); }
 .result .lbl { font-family: var(--display); font-size: 24px; margin-top: 6px; }
 @keyframes result {
   0% { opacity: 0; transform: scale(0.4); }
@@ -421,7 +438,7 @@ a.btn { text-decoration: none; }
   z-index: 60;
   padding: 18px 16px max(18px, env(safe-area-inset-bottom));
   border-radius: 24px 24px 0 0;
-  background: #26180d;
+  background: var(--color-surface);
   box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 var(--line);
   transform: translateY(105%);
   transition: transform 0.28s cubic-bezier(.2, .8, .3, 1);
@@ -432,7 +449,7 @@ a.btn { text-decoration: none; }
   overflow-y: auto;
 }
 .sheet.show { transform: none; }
-.sheet h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; }
+.sheet h3 { margin: 0; font: 800 22px/1.2 var(--font-body); }
 .opt-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
 .emoji-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .emoji-grid button {
@@ -442,7 +459,7 @@ a.btn { text-decoration: none; }
   background: rgba(255, 255, 255, 0.05);
   font-size: 30px;
 }
-.emoji-grid button.on { background: rgba(255, 122, 26, 0.25); box-shadow: inset 0 0 0 2px var(--accent); }
+.emoji-grid button.on { background: rgba(217, 255, 68, 0.16); box-shadow: inset 0 0 0 2px var(--accent); }
 .seg { display: flex; gap: 6px; }
 .seg button {
   flex: 1;
@@ -452,7 +469,7 @@ a.btn { text-decoration: none; }
   background: rgba(255, 255, 255, 0.05);
   font-weight: 700;
 }
-.seg button.on { background: var(--accent); color: #2a1406; }
+.seg button.on { background: var(--accent); color: var(--color-on-brand); }
 .sheet-backdrop { position: fixed; inset: 0; z-index: 55; background: rgba(0, 0, 0, 0.4); display: none; }
 .sheet-backdrop.show { display: block; }
 
