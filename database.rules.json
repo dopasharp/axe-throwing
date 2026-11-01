@@ -1,0 +1,129 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$room": {
+        ".read": "auth != null && $room.matches(/^[a-f0-9]{32}$/)",
+        ".write": "(auth != null && $room.matches(/^[a-f0-9]{32}$/) && !data.exists() && newData.child('left/uid').val() == auth.uid && newData.child('left/taps').val() == 0 && newData.child('left/lastTap').val() == 0 && !newData.child('right').exists() && !newData.child('startAt').exists() && newData.child('round').val() == 0) || (auth != null && data.child('right').exists() && (data.child('left/uid').val() == auth.uid || data.child('right/uid').val() == auth.uid) && newData.child('round').val() == data.child('round').val() + 1 && newData.child('createdAt').val() == data.child('createdAt').val() && newData.child('mode').val() == data.child('mode').val() && newData.child('left/uid').val() == data.child('left/uid').val() && newData.child('right/uid').val() == data.child('right/uid').val() && newData.child('left/taps').val() == 0 && newData.child('right/taps').val() == 0 && newData.child('left/lastTap').val() == 0 && newData.child('right/lastTap').val() == 0 && newData.child('startAt').val() == now)",
+        ".validate": "newData.hasChildren(['createdAt','mode','round','left'])",
+        "createdAt": {
+          ".validate": "newData.isNumber() && ((!data.exists() && newData.val() == now) || newData.val() == data.val())"
+        },
+        "startAt": {
+          ".write": "auth != null && !data.exists() && root.child('rooms').child($room).child('right').exists() && (root.child('rooms').child($room).child('left/uid').val() == auth.uid || root.child('rooms').child($room).child('right/uid').val() == auth.uid)",
+          ".validate": "newData.isNumber() && newData.val() == now"
+        },
+        "left": {
+          ".write": "((auth != null && data.child('uid').val() == auth.uid && newData.child('uid').val() == auth.uid && root.child('rooms').child($room).child('startAt').exists() && now >= root.child('rooms').child($room).child('startAt').val() + 3000 && newData.child('taps').val() == data.child('taps').val() + 1 && newData.child('lastTap').val() == now && now - data.child('lastTap').val() >= 60) && newData.child('round').val() == root.child('rooms').child($room).child('round').val() && (!data.exists() || data.child('round').val() == root.child('rooms').child($room).child('round').val())) || (auth != null && data.exists() && newData.child('uid').val() == auth.uid && root.child('rooms').child($room).child('seatKeys/left').isString() && newData.child('accessKey').val() == root.child('rooms').child($room).child('seatKeys/left').val() && newData.child('taps').val() == data.child('taps').val() && newData.child('lastTap').val() == data.child('lastTap').val() && newData.child('round').val() == data.child('round').val())",
+          ".validate": "newData.hasChildren(['uid','taps','lastTap','round'])",
+          "uid": {
+            ".validate": "newData.isString()"
+          },
+          "taps": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9007199254740991 && newData.val() % 1 == 0"
+          },
+          "lastTap": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "$other": {
+            ".validate": false
+          },
+          "round": {
+            ".validate": "newData.isNumber() && newData.val() == newData.parent().parent().child('round').val()"
+          },
+          "accessKey": {
+            ".validate": "newData.isString() && newData.val() == newData.parent().parent().child('seatKeys/left').val()"
+          }
+        },
+        "right": {
+          ".write": "((auth != null && ((!data.exists() && root.child('rooms').child($room).child('left').exists() && root.child('rooms').child($room).child('left/uid').val() != auth.uid && !root.child('rooms').child($room).child('startAt').exists() && newData.child('uid').val() == auth.uid && newData.child('taps').val() == 0 && newData.child('lastTap').val() == 0) || (data.child('uid').val() == auth.uid && newData.child('uid').val() == auth.uid && root.child('rooms').child($room).child('startAt').exists() && now >= root.child('rooms').child($room).child('startAt').val() + 3000 && newData.child('taps').val() == data.child('taps').val() + 1 && newData.child('lastTap').val() == now && now - data.child('lastTap').val() >= 60))) && newData.child('round').val() == root.child('rooms').child($room).child('round').val() && (!data.exists() || data.child('round').val() == root.child('rooms').child($room).child('round').val())) || (auth != null && data.exists() && newData.child('uid').val() == auth.uid && root.child('rooms').child($room).child('seatKeys/right').isString() && newData.child('accessKey').val() == root.child('rooms').child($room).child('seatKeys/right').val() && newData.child('taps').val() == data.child('taps').val() && newData.child('lastTap').val() == data.child('lastTap').val() && newData.child('round').val() == data.child('round').val())",
+          ".validate": "newData.hasChildren(['uid','taps','lastTap','round'])",
+          "uid": {
+            ".validate": "newData.isString()"
+          },
+          "taps": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9007199254740991 && newData.val() % 1 == 0"
+          },
+          "lastTap": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "$other": {
+            ".validate": false
+          },
+          "round": {
+            ".validate": "newData.isNumber() && newData.val() == newData.parent().parent().child('round').val()"
+          },
+          "accessKey": {
+            ".validate": "newData.isString() && newData.val() == newData.parent().parent().child('seatKeys/right').val()"
+          }
+        },
+        "$other": {
+          ".validate": false
+        },
+        "mode": {
+          ".validate": "newData.isString() && (newData.val() == 'together' || newData.val() == 'remote')"
+        },
+        "round": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 == 0 && ((!data.exists() && newData.val() == 0) || (data.exists() && (newData.val() == data.val() || newData.val() == data.val() + 1)))"
+        },
+        "initials": {
+          ".validate": "newData.hasChildren(['left','right']) && (!data.exists() || (newData.child('left').val() == data.child('left').val() && newData.child('right').val() == data.child('right').val()))",
+          "left": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 12"
+          },
+          "right": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 12"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "meetingMessage": {
+          ".validate": "newData.isString() && newData.val().length <= 40 && (!data.exists() || newData.val() == data.val())"
+        },
+        "seatKeys": {
+          ".validate": "newData.hasChildren(['left','right']) && (!data.exists() || (newData.child('left').val() == data.child('left').val() && newData.child('right').val() == data.child('right').val()))",
+          "left": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
+          },
+          "right": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "sojuRooms": {
+      "$room": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "axeRooms": {
+      "$room": {
+        ".read": "$room.matches(/^[A-Z0-9]{4,8}$/)",
+        ".write": "$room.matches(/^[A-Z0-9]{4,8}$/)",
+        "meta": {
+          ".validate": "newData.hasChildren(['createdAt'])"
+        },
+        "axe": {
+          ".validate": "newData.hasChildren(['emoji'])"
+        },
+        "throws": {
+          "$t": {
+            ".validate": "newData.child('power').isNumber() && newData.child('aimX').isNumber() && newData.child('emoji').isString() && newData.child('emoji').val().length <= 8"
+          }
+        },
+        "state": {
+          ".validate": "newData.hasChildren(['thrown','total'])"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}

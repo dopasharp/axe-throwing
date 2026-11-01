@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1a110a">
+  <title>도끼 던지기 · 과녁</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module" src="js/target.js"></script>
+</head>
+<body class="target-page">
+  <div class="wall">
+    <header class="hud">
+      <div class="hud-left">
+        <div class="room">ROOM <b id="roomCode">-----</b></div>
+        <span id="modeBadge" class="badge" hidden>로컬 테스트 모드</span>
+      </div>
+      <div class="hud-score"><span id="total">0</span><small>점</small></div>
+      <button id="qrBtn" class="icon-btn" aria-label="QR 코드 보기">📱</button>
+    </header>
+
+    <div id="throwsLeft" class="throws-left" aria-label="남은 도끼"></div>
+
+    <main class="stage">
+      <div id="target" class="target">
+        <svg viewBox="-110 -110 220 220" aria-hidden="true">
+          <defs>
+            <radialGradient id="wood" cx="45%" cy="40%" r="65%">
+              <stop offset="0" stop-color="#e6b885" />
+              <stop offset="1" stop-color="#a86a3a" />
+            </radialGradient>
+            <filter id="grain" x="-5%" y="-5%" width="110%" height="110%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.012 0.32" numOctaves="3" seed="7" result="n" />
+              <feColorMatrix in="n" type="matrix"
+                values="0 0 0 0 0.22  0 0 0 0 0.11  0 0 0 0 0.04  1.4 0 0 0 -0.55" result="c" />
+              <feComposite in="c" in2="SourceGraphic" operator="atop" />
+            </filter>
+          </defs>
+          <circle r="107" fill="#2b1709" />
+          <circle r="104" fill="none" stroke="#6b4223" stroke-width="3" stroke-dasharray="2 5" />
+          <g filter="url(#grain)" stroke="#1a0f08" stroke-width="1.4">
+            <circle r="100" fill="url(#wood)" />
+            <circle r="85" fill="#2457c5" />
+            <circle r="60" fill="url(#wood)" />
+            <circle r="35" fill="#d61f2c" />
+            <circle r="12" fill="#f3e5c8" />
+            <circle r="4" fill="#d61f2c" stroke="none" />
+          </g>
+          <g font-family="Black Han Sans, sans-serif" font-size="10" text-anchor="middle" dominant-baseline="central">
+            <text y="-92.5" fill="#3a1d0a">1</text>
+            <text y="-72.5" fill="#fff">2</text>
+            <text y="-47.5" fill="#3a1d0a">3</text>
+            <text y="-23.5" fill="#fff">4</text>
+          </g>
+        </svg>
+        <div id="stuck" class="stuck-layer"></div>
+      </div>
+    </main>
+
+    <footer class="status">
+      <span id="axeDot" class="dot off"></span>
+      <span id="axeText">도끼 폰을 기다리는 중…</span>
+    </footer>
+  </div>
+
+  <div id="flyLayer" class="fly-layer"></div>
+  <div id="banner" class="banner"></div>
+
+  <section id="qrOverlay" class="overlay show">
+    <div class="card">
+      <h1>🪓 도끼 던지기</h1>
+      <p>도끼가 될 휴대폰으로<br><b>QR 코드를 스캔</b>하세요</p>
+      <div id="qr" class="qr"></div>
+      <div class="code">방 코드<b id="roomCode2">-----</b></div>
+      <a id="axeLink" class="link" target="_blank" rel="noopener">도끼 링크</a>
+      <button id="soundBtn" class="btn">🔊 소리 켜기</button>
+      <button id="closeQr" class="btn ghost" hidden>닫기</button>
+    </div>
+  </section>
+
+  <section id="roundOverlay" class="overlay">
+    <div class="card">
+      <h2>라운드 종료!</h2>
+      <div class="big-total"><span id="roundTotal">0</span>점</div>
+      <div id="roundScores" class="scores"></div>
+      <p id="bestText"></p>
+      <button id="againBtn" class="btn">🪓 다시 하기</button>
+      <p class="warn">도끼 폰에서 다시 던져도 새 라운드가 시작돼요</p>
+    </div>
+  </section>
+</body>
+</html>

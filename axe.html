@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1a110a">
+  <title>도끼 던지기 · 도끼</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪓</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/axe.js"></script>
+</head>
+<body class="axe-page">
+  <!-- 방 코드 입력 (QR 없이 들어온 경우) -->
+  <section id="joinScreen" class="screen" hidden>
+    <form id="joinForm" class="card">
+      <div class="hero-emoji">🪓</div>
+      <h1>도끼 입장</h1>
+      <p>과녁 화면에 보이는 방 코드를 입력하세요</p>
+      <input id="codeInput" class="code-input" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCDE">
+      <button class="btn" type="submit">입장하기</button>
+      <p id="joinError" class="error"></p>
+    </form>
+  </section>
+
+  <!-- 센서 허용 + 시작 -->
+  <section id="startScreen" class="screen" hidden>
+    <div class="card">
+      <div id="startEmoji" class="hero-emoji">🪓</div>
+      <h1>도끼 준비 완료</h1>
+      <p>방 <b id="startRoom"></b> 과녁에 연결됐어요</p>
+      <button id="startBtn" class="btn">🔥 시작하기</button>
+      <p class="warn">⚠️ 폰을 놓치지 않게 <b>꽉 쥐고</b> 휘두르세요!<br>iPhone은 "동작 및 방향 접근" 허용이 필요해요</p>
+      <p id="startError" class="error"></p>
+    </div>
+  </section>
+
+  <!-- 게임 -->
+  <section id="gameScreen" class="screen" hidden>
+    <header class="axe-hud">
+      <div class="meta">
+        <span>ROOM <b id="hudRoom"></b></span>
+        <span id="hudCount">0 / 5</span>
+      </div>
+      <div class="score"><span id="hudTotal">0</span><small>점</small></div>
+      <button id="optBtn" class="icon-btn" aria-label="옵션">⚙️</button>
+    </header>
+
+    <div class="aim" id="aimBox">
+      <div class="aim-track"><div id="aimDot" class="aim-dot"></div></div>
+      폰을 좌우로 기울여 조준
+    </div>
+
+    <div id="zone" class="zone">
+      <div id="bigAxe" class="big-axe ready">🪓</div>
+      <div id="result" class="result"></div>
+    </div>
+
+    <div class="power" aria-label="마지막 파워"><i id="powerBar"></i></div>
+    <p id="hint" class="hint"><b>과녁을 향해 폰을 힘껏 휘두르세요!</b><br><small>또는 도끼를 위로 휙 스와이프</small></p>
+    <div class="axe-status"><span id="connDot" class="dot on"></span><span id="connText">과녁 연결됨</span></div>
+  </section>
+
+  <div id="sheetBackdrop" class="sheet-backdrop"></div>
+  <section id="optSheet" class="sheet" aria-label="옵션">
+    <h3>⚙️ 옵션</h3>
+    <div>
+      <div class="opt-label">던질 물건</div>
+      <div id="emojiGrid" class="emoji-grid"></div>
+    </div>
+    <div>
+      <div class="opt-label">흔들기 감도</div>
+      <div id="sensSeg" class="seg">
+        <button data-v="low">둔감</button>
+        <button data-v="mid">보통</button>
+        <button data-v="high">민감</button>
+      </div>
+    </div>
+    <div>
+      <div class="opt-label">소리</div>
+      <div id="soundSeg" class="seg">
+        <button data-v="on">🔊 켜기</button>
+        <button data-v="off">🔇 끄기</button>
+      </div>
+    </div>
+    <div>
+      <div class="opt-label">진동</div>
+      <div id="vibeSeg" class="seg">
+        <button data-v="on">📳 켜기</button>
+        <button data-v="off">끄기</button>
+      </div>
+    </div>
+    <button id="optClose" class="btn">확인</button>
+  </section>
+</body>
+</html>
