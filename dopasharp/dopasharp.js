@@ -1,20 +1,22 @@
-/* DOPA# shared brand frame v1.0 — identical in every DOPASHARP repo. Needs tokens.css + components.css.
+/* DOPA# shared brand frame v1.1 — identical in every DOPASHARP repo. Needs tokens.css + components.css.
    A page names itself with <meta name="dopasharp:game" content="soju-game">, then:
    - <header data-dopa="header"></header>  → D# logo · GAME 00N / CODE · "다른 게임 보기"
    - <footer data-dopa="footer"></footer>  → MADE BY DOPA#
    - DopaSharp.showResult({...})           → result sheet: retry / copy / share / challenge / other games
-   - DopaSharp.moreGames()                 → other games sheet
+   - DopaSharp.moreGames() or [data-dopa-more] → the games page on the hub (dopasharp.github.io/games/)
    - DopaSharp.track(name, params)         → game_view, game_start, game_complete, game_retry, share_click, more_games_click */
 (function(){
-// The one list of DOPASHARP games; its order sets the game numbers. Add new games here and copy this file to every repo.
+// Mirrors the hub's list (dopasharp.github.io/games.js): same order, so GAME 00N matches the hub cards.
+// When the hub list changes, update this list and copy this file to every repo.
 const GAMES=[
- {id:'soju-game',    code:'SOJU',    art:'🍶',name:'짠! 소주 따르기',tagline:'휴대폰 두 대로 소주 한 잔 따르기'},
- {id:'croc-chomp',   code:'CROC',    art:'🐊',name:'악어 이빨 게임', tagline:'이 중 하나는 물립니다.'},
- {id:'gacha-capsule',code:'GACHA',   art:'🎁',name:'가챠 캡슐',     tagline:'오늘의 운을 뽑아보세요.'},
- {id:'birthday-hoo', code:'BIRTHDAY',art:'🎂',name:'생일 이벤트',    tagline:'친구에게 특별한 축하를.'},
- {id:'axe-throwing', code:'AXE',     art:'🪓',name:'도끼 던지기',    tagline:'휴대폰을 휘둘러 과녁 맞히기'},
- {id:'truth-mirror', code:'MIRROR',  art:'🪞',name:'진실의 거울',    tagline:'거울에게 진실을 물어보세요.'},
- {id:'ppro_game',    code:'PEPERO',  art:'🥢',name:'빼빼로 게임',    tagline:'둘이 함께 탭하는 빼빼로 게임'}
+ {id:'soju-game',    code:'SOJU',    art:'🍶',name:'짠! 소주 따르기'},
+ {id:'ppro_game',    code:'PEPERO',  art:'🍫',name:'빼빼로게임'},
+ {id:'croc-chomp',   code:'CROC',    art:'🐊',name:'악어 이빨 게임'},
+ {id:'hbd-lotto',    code:'LOTTO',   art:'🎟️',name:'생일 복권'},
+ {id:'birthday-hoo', code:'BIRTHDAY',art:'🎂',name:'생일 케이크'},
+ {id:'axe-throwing', code:'AXE',     art:'🪓',name:'도끼 던지기'},
+ {id:'truth-mirror', code:'MIRROR',  art:'🪞',name:'진실의 거울'},
+ {id:'gacha-capsule',code:'GACHA',   art:'🎰',name:'랜덤 뽑기'}
 ].map((g,i)=>({...g,no:String(i+1).padStart(3,'0'),url:`https://dopasharp.github.io/${g.id}/`}));
 const LOGO='<svg viewBox="0 0 132 80" fill="currentColor" aria-hidden="true"><g transform="translate(18 0) skewX(-14)"><path fill-rule="evenodd" d="M18 10h25c19 0 30 12 30 30S62 70 43 70H18zm15 13v34h9c10 0 16-6.5 16-17s-6-17-16-17z"/><rect x="83" y="12" width="9" height="56"/><rect x="100" y="12" width="9" height="56"/><rect x="77" y="27" width="38" height="9"/><rect x="77" y="45" width="38" height="9"/></g></svg>';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -32,13 +34,10 @@ function track(name,params){
 }
 
 const HUB='https://dopasharp.github.io/';
+// Every "other games" entry leads to the hub's games page, which hides the game the player came from.
+const gamesUrl=()=>`${HUB}games/${current?'?from='+encodeURIComponent(current.id):''}`;
 const brandHTML=()=>`<a class="dopa-brand" href="${HUB}" aria-label="DOPASHARP 홈">${logo}${current?`<span class="dopa-label">GAME ${current.no} / ${current.code}</span>`:''}</a>`;
 const footerHTML=`<span>MADE BY DOPA#</span>`;
-function cardsHTML(){
- return `<div class="dopa-games">`+GAMES.filter(g=>g!==current).map(g=>
-  `<a class="dopa-card" href="${esc(g.url)}" data-dopa-game="${esc(g.id)}"><span class="dopa-card-art" aria-hidden="true">${g.art}</span><span class="dopa-card-body"><span class="dopa-label">DOPA# ${g.no}</span><b>${esc(g.name)}</b><small>${esc(g.tagline)}</small></span><span class="dopa-card-go" aria-hidden="true">PLAY →</span></a>`).join('')+`</div>`;
-}
-
 let toastTimer;
 function toast(text){
  let t=document.querySelector('.dopa-toast');
@@ -64,7 +63,7 @@ function openSheet(inner,label){
   document.body.appendChild(sheet);
  }
  lastFocus=document.activeElement;
- sheet.innerHTML=`<div class="dopa-sheet-card" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1"><div class="dopa-header">${brandHTML()}<button class="dopa-close" data-dopa-close aria-label="닫기">✕</button></div>${inner}<h3 class="dopa-label dopa-section-title">다른 DOPA# 게임</h3>${cardsHTML()}<div class="dopa-footer">${footerHTML}</div></div>`;
+ sheet.innerHTML=`<div class="dopa-sheet-card" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1"><div class="dopa-header">${brandHTML()}<button class="dopa-close" data-dopa-close aria-label="닫기">✕</button></div>${inner}<a class="dopa-button dopa-button--tertiary dopa-more-link" href="${esc(gamesUrl())}" data-dopa-more>다른 DOPA# 게임 보기 →</a><div class="dopa-footer">${footerHTML}</div></div>`;
  sheet.hidden=false;
  const card=sheet.firstElementChild;(card.querySelector('[data-act]')||card).focus({preventScroll:true});
  return card;
@@ -84,19 +83,19 @@ function showResult(opts){
   const act=e.target.closest('[data-act]')?.dataset.act;if(!act)return;
   if(act==='retry'){track('game_retry');close();o.onRetry();return}
   track('share_click',{method:act});
-  if(act==='copy')copy(`${result}\n${pageUrl()}\n#DOPASHARP #도파샵`,'결과를 복사했어요.');
+  if(act==='copy')copy(`${result}\n${pageUrl()}\n#DOPASHARP #도파샾`,'결과를 복사했어요.');
   else if(act==='link')share({title:name,url:pageUrl()},'링크를 복사했어요.');
   else share({title:name,text:`${result}\n이 기록, 깰 수 있을까요?`,url:pageUrl()},'도전 메시지를 복사했어요.');
  };
 }
-function moreGames(){openSheet('','다른 DOPA# 게임')}
+function moreGames(){location.href=gamesUrl()}
 
 function mount(){
- document.querySelectorAll('[data-dopa="header"]').forEach(el=>{el.classList.add('dopa-header');el.innerHTML=brandHTML()+`<button class="dopa-button dopa-button--tertiary" data-dopa-more>다른 게임 보기</button>`});
+ document.querySelectorAll('[data-dopa="header"]').forEach(el=>{el.classList.add('dopa-header');el.innerHTML=brandHTML()+`<a class="dopa-button dopa-button--tertiary" href="${esc(gamesUrl())}" data-dopa-more>다른 게임 보기</a>`});
  document.querySelectorAll('[data-dopa="footer"]').forEach(el=>{el.classList.add('dopa-footer');el.innerHTML=footerHTML});
  document.addEventListener('click',e=>{
-  if(e.target.closest('[data-dopa-more]')){track('more_games_click',{from:'button'});moreGames()}
-  const card=e.target.closest('[data-dopa-game]');if(card)track('more_games_click',{to:card.dataset.dopaGame});
+  // Links navigate on their own; plain buttons marked data-dopa-more are sent to the games page.
+  const more=e.target.closest('[data-dopa-more]');if(more){track('more_games_click',{from:more.tagName==='A'?'link':'button'});if(more.tagName!=='A')moreGames()}
  });
  track('game_view');
 }

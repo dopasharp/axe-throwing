@@ -1,4 +1,4 @@
-/* DOPA# shared components v1.0 — identical in every DOPASHARP repo. Needs tokens.css.
+/* DOPA# shared components v1.1 — identical in every DOPASHARP repo. Needs tokens.css.
    Only the brand frame is styled here (header, buttons, game cards, result sheet, footer);
    each game keeps its own colors for the play screen. Everything is scoped to .dopa-* classes. */
 
@@ -61,7 +61,7 @@
 .dopa-actions>.dopa-button:first-child,.dopa-actions>.dopa-button--wide{grid-column:1/-1}
 .dopa-challenge{border-color:var(--color-pink);color:var(--color-pink)}
 .dopa-challenge:hover{border-color:var(--color-pink);background:#ff6c911a}
-.dopa-section-title{margin:var(--space-8) 0 var(--space-3)}
+.dopa-more-link{display:flex;width:100%;margin-top:var(--space-4)}
 .dopa-sheet .dopa-footer{padding-bottom:0}
 
 .dopa-toast{position:fixed;left:50%;bottom:calc(var(--space-8) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:1100;max-width:calc(100vw - 40px);padding:var(--space-3) 20px;border-radius:var(--radius-pill);background:var(--color-text);color:var(--color-bg);font:600 var(--text-small)/1.4 var(--font-body);box-shadow:0 8px 30px #0008;text-align:center}
