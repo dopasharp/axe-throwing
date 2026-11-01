@@ -25,7 +25,7 @@ GitHub Pages(정적 호스팅) + Firebase Realtime Database(실시간 연동)로
 1. [Firebase 콘솔](https://console.firebase.google.com) → **프로젝트 추가**.
 2. 빌드 → **Realtime Database** → 데이터베이스 만들기 (위치 아무거나, "잠금 모드"로 시작해도 OK).
 3. Realtime Database → **규칙** 탭에 [`database.rules.json`](database.rules.json) 내용을 붙여넣고 **게시**.
-   - 이 게임은 DB의 `axeRooms/` 경로만 써요. 기존 `rooms`, `sojuRooms` 규칙도 그대로 들어 있어요.
+   - 이 게임은 전용 Firebase 프로젝트(`axe-th`)의 `axeRooms/` 경로만 써요.
 4. 프로젝트 설정(⚙️) → 내 앱 → **웹 앱(</>) 추가** → 표시되는 `firebaseConfig` 값을
    [`js/firebase-config.js`](js/firebase-config.js)에 붙여넣기.
    - `databaseURL`이 꼭 있어야 해요 (Realtime Database를 만든 뒤에 복사하면 들어있음).
