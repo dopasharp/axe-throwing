@@ -71,7 +71,19 @@
   <div id="flyLayer" class="fly-layer"></div>
   <div id="banner" class="banner"></div>
 
-  <section id="qrOverlay" class="overlay show">
+  <section id="lobby" class="overlay show">
+    <div class="card">
+      <div class="hero-emoji">🎯</div>
+      <h1>도끼 던지기</h1>
+      <p>휴대폰 두 대로 하는 도끼 던지기<br>이 폰이 <b>과녁</b>이 돼요</p>
+      <button id="createBtn" class="btn">🎯 과녁 방 만들기</button>
+      <a class="btn ghost" href="axe.html">🪓 코드로 도끼 참가</a>
+      <p class="warn">1. 과녁 방 만들기 → 2. 다른 폰으로 QR 스캔<br>3. 도끼 폰을 휘둘러 던지기!</p>
+      <p id="lobbyError" class="error"></p>
+    </div>
+  </section>
+
+  <section id="qrOverlay" class="overlay">
     <div class="card">
       <h1>🪓 도끼 던지기</h1>
       <p>도끼가 될 휴대폰으로<br><b>QR 코드를 스캔</b>하세요</p>

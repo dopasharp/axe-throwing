@@ -47,6 +47,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   box-shadow: 0 6px 0 #a3420a, 0 10px 24px rgba(0, 0, 0, 0.4);
   transition: transform 0.08s, box-shadow 0.08s;
 }
+a.btn { text-decoration: none; }
 .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #a3420a, 0 4px 10px rgba(0, 0, 0, 0.4); }
 .btn.ghost {
   background: transparent;

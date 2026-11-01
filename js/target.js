@@ -1,4 +1,4 @@
-import { mode, makeRoomId, hostRoom } from './net.js';
+import { mode, makeRoomId, normalizeRoomId, hostRoom } from './net.js';
 import * as S from './sound.js';
 
 const PER_ROUND = 5;
@@ -14,19 +14,27 @@ const els = {
 };
 
 // ------------------------------------------------------------------ 방 & QR
-const roomId = makeRoomId();
-const axeUrl = new URL(`axe.html?room=${roomId}${mode === 'local' ? '&local=1' : ''}`, location.href).href;
+let roomId = null;
 
-$('roomCode').textContent = roomId;
-$('roomCode2').textContent = roomId;
-$('axeLink').href = axeUrl;
-$('axeLink').textContent = axeUrl;
-$('modeBadge').hidden = mode !== 'local';
-if (window.QRCode) {
-  new QRCode($('qr'), { text: axeUrl, width: 440, height: 440, correctLevel: QRCode.CorrectLevel.M });
-} else {
-  $('qr').textContent = 'QR 라이브러리를 불러오지 못했어요';
+function showRoomQr(id) {
+  const local = mode === 'local' ? '&local=1' : '';
+  const axeUrl = new URL(`axe.html?room=${id}${local}`, location.href).href;
+  $('roomCode').textContent = id;
+  $('roomCode2').textContent = id;
+  $('axeLink').href = axeUrl;
+  $('axeLink').textContent = axeUrl;
+  $('qr').innerHTML = '';
+  if (window.QRCode) {
+    new QRCode($('qr'), { text: axeUrl, width: 440, height: 440, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    $('qr').textContent = 'QR 라이브러리를 불러오지 못했어요';
+  }
+  // 새로고침해도 같은 방 코드로 다시 열리도록 주소에 기록
+  const u = new URL(location.href);
+  u.searchParams.set('room', id);
+  history.replaceState(null, '', u);
 }
+$('modeBadge').hidden = mode !== 'local';
 
 // ------------------------------------------------------------------ 게임 상태
 let best = 0;
@@ -252,7 +260,13 @@ function flyIn(hit, emoji) {
     { duration: dur, easing: 'linear', fill: 'forwards' },
   );
   S.spin({ turns: hit.turns, dur: dur / 1000, approach: true });
-  return spinAnim.finished.then(() => ({ outer, inner, ex, ey }));
+  // 백그라운드 탭 등에서 애니메이션이 멈춰도 판정은 진행되도록 타이머로 보장
+  const timeout = new Promise((r) => setTimeout(r, dur + 150));
+  return Promise.race([spinAnim.finished, timeout]).then(() => {
+    outer.getAnimations().forEach((a) => a.finish());
+    spinAnim.finish();
+    return { outer, inner, ex, ey };
+  });
 }
 
 function bounceOff({ outer, inner, ex, ey }, hit) {
@@ -367,16 +381,36 @@ $('qrBtn').addEventListener('click', () => els.qrOverlay.classList.add('show'));
 $('closeQr').addEventListener('click', () => els.qrOverlay.classList.remove('show'));
 $('againBtn').addEventListener('click', newRound);
 
-// ------------------------------------------------------------------ 시작
-renderHud();
-try {
-  net = await hostRoom(roomId, { onAxe, onThrow });
-  publish();
-} catch (e) {
-  console.error(e);
-  els.axeText.textContent = '⚠️ Firebase 연결 실패 — js/firebase-config.js 를 확인하세요';
+// ------------------------------------------------------------------ 방 만들기
+async function openRoom(id) {
+  const btn = $('createBtn');
+  btn.disabled = true;
+  btn.textContent = '방 만드는 중…';
+  try {
+    net = await hostRoom(id, { onAxe, onThrow });
+    roomId = id;
+    publish();
+    showRoomQr(id);
+    $('lobby').classList.remove('show');
+    els.qrOverlay.classList.add('show');
+  } catch (e) {
+    console.error(e);
+    $('lobbyError').textContent = '방을 만들지 못했어요. 인터넷 연결을 확인하고 다시 시도하세요.';
+    btn.disabled = false;
+    btn.textContent = '🎯 과녁 방 만들기';
+  }
 }
+
+$('createBtn').addEventListener('click', () => {
+  unlock();
+  S.ding(2);
+  openRoom(makeRoomId());
+});
+
+renderHud();
+const reopen = normalizeRoomId(new URLSearchParams(location.search).get('room'));
+if (reopen.length >= 4) openRoom(reopen);
 
 // 개발용: 콘솔에서 testThrow() 로 과녁 단독 테스트
 window.testThrow = (power = Math.random(), aimX = rand(-0.5, 0.5), emoji = '🪓') =>
-  onThrow(`test-${Date.now()}`, { power, aimX, emoji });
+  roomId && onThrow(`test-${Date.now()}`, { power, aimX, emoji });

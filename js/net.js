@@ -88,7 +88,14 @@ export async function joinRoom(roomId, info, { onState, onTarget }) {
     d.onDisconnect(path('/axe')).remove();
     d.set(path('/axe'), { ...current, at: d.serverTimestamp() });
   });
-  d.onValue(path('/meta'), (s) => onTarget(s.exists()));
+  // 과녁이 새로고침되면 방이 지워졌다 다시 생기므로, 다시 생길 때 도끼 접속을 재등록
+  let targetUp = true;
+  d.onValue(path('/meta'), (s) => {
+    const up = s.exists();
+    if (up && !targetUp) d.set(path('/axe'), { ...current, at: d.serverTimestamp() });
+    targetUp = up;
+    onTarget(up);
+  });
   d.onValue(path('/state'), (s) => s.exists() && onState(s.val()));
 
   return {
