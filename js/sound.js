@@ -4,6 +4,8 @@ let enabled = true;
 
 export function unlockAudio() {
   if (!ctx) {
+    // iOS: 무음 모드에서도 효과음이 나도록 (iOS 17+ Safari)
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
     ctx = new AC();

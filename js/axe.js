@@ -1,5 +1,5 @@
 import { joinRoom, normalizeRoomId } from './net.js?v=4';
-import * as S from './sound.js?v=4';
+import * as S from './sound.js?v=5';
 
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));

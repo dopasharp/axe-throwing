@@ -1,5 +1,5 @@
 import { mode, makeRoomId, normalizeRoomId, hostRoom } from './net.js?v=4';
-import * as S from './sound.js?v=4';
+import * as S from './sound.js?v=5';
 
 const PER_ROUND = 5;
 const $ = (id) => document.getElementById(id);
