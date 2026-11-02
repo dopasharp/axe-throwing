@@ -1,7 +1,7 @@
-/* DOPA# shared brand frame v1.1 — identical in every DOPASHARP repo. Needs tokens.css + components.css.
+/* 도파# shared brand frame v1.2 — identical in every dopa.shap repo. Needs tokens.css + components.css.
    A page names itself with <meta name="dopasharp:game" content="soju-game">, then:
    - <header data-dopa="header"></header>  → D# logo · GAME 00N / CODE · "다른 게임 보기"
-   - <footer data-dopa="footer"></footer>  → MADE BY DOPA#
+   - <footer data-dopa="footer"></footer>  → MADE BY 도파#
    - DopaSharp.showResult({...})           → result sheet: retry / copy / share / challenge / other games
    - DopaSharp.moreGames() or [data-dopa-more] → the games page on the hub (dopasharp.github.io/games/)
    - DopaSharp.track(name, params)         → game_view, game_start, game_complete, game_retry, share_click, more_games_click */
@@ -24,20 +24,23 @@ const meta=document.querySelector('meta[name="dopasharp:game"]');
 const current=GAMES.find(g=>g.id===(meta&&meta.content))||null;
 const gameId=current?current.id:location.pathname;
 const pageUrl=()=>location.origin+location.pathname;
-const logo=`<span class="dopa-logo" role="img" aria-label="DOPA#">${LOGO}</span>`;
+const logo=`<span class="dopa-logo" role="img" aria-label="도파#">${LOGO}</span>`;
 
-// Analytics with the shared event names. Sends to gtag / dataLayer when a page has them, and always fires a DOM event.
+// Analytics with the shared event names. The hub's analytics.js holds the GA4 ID; events wait here until it has loaded.
+const pending=window.__dopaPending=window.__dopaPending||[];
 function track(name,params){
  const data={game_id:gameId,...params};
- try{if(typeof window.gtag==='function')window.gtag('event',name,data);else if(Array.isArray(window.dataLayer))window.dataLayer.push({event:name,...data})}catch(e){}
+ try{if(window.__dopaGA)window.gtag('event',name,data);else pending.push([name,data])}catch(e){}
  document.dispatchEvent(new CustomEvent('dopasharp:track',{detail:{name,...data}}));
 }
 
 const HUB='https://dopasharp.github.io/';
+// One GA4 setup for every game: load the hub's analytics.js (it does nothing until a GA4 ID is set there).
+if(!document.querySelector('script[src$="/analytics.js"]')){const s=document.createElement('script');s.src=HUB+'analytics.js';s.async=true;document.head.appendChild(s)}
 // Every "other games" entry leads to the hub's games page, which hides the game the player came from.
 const gamesUrl=()=>`${HUB}games/${current?'?from='+encodeURIComponent(current.id):''}`;
-const brandHTML=()=>`<a class="dopa-brand" href="${HUB}" aria-label="DOPASHARP 홈">${logo}${current?`<span class="dopa-label">GAME ${current.no} / ${current.code}</span>`:''}</a>`;
-const footerHTML=`<span>MADE BY DOPA#</span>`;
+const brandHTML=()=>`<a class="dopa-brand" href="${HUB}" aria-label="도파# 홈">${logo}${current?`<span class="dopa-label">GAME ${current.no} / ${current.code}</span>`:''}</a>`;
+const footerHTML=`<span>MADE BY 도파#</span>`;
 let toastTimer;
 function toast(text){
  let t=document.querySelector('.dopa-toast');
@@ -63,7 +66,7 @@ function openSheet(inner,label){
   document.body.appendChild(sheet);
  }
  lastFocus=document.activeElement;
- sheet.innerHTML=`<div class="dopa-sheet-card" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1"><div class="dopa-header">${brandHTML()}<button class="dopa-close" data-dopa-close aria-label="닫기">✕</button></div>${inner}<a class="dopa-button dopa-button--tertiary dopa-more-link" href="${esc(gamesUrl())}" data-dopa-more>다른 DOPA# 게임 보기 →</a><div class="dopa-footer">${footerHTML}</div></div>`;
+ sheet.innerHTML=`<div class="dopa-sheet-card" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1"><div class="dopa-header">${brandHTML()}<button class="dopa-close" data-dopa-close aria-label="닫기">✕</button></div>${inner}<a class="dopa-button dopa-button--tertiary dopa-more-link" href="${esc(gamesUrl())}" data-dopa-more>다른 도파# 게임 보기 →</a><div class="dopa-footer">${footerHTML}</div></div>`;
  sheet.hidden=false;
  const card=sheet.firstElementChild;(card.querySelector('[data-act]')||card).focus({preventScroll:true});
  return card;
@@ -83,7 +86,7 @@ function showResult(opts){
   const act=e.target.closest('[data-act]')?.dataset.act;if(!act)return;
   if(act==='retry'){track('game_retry');close();o.onRetry();return}
   track('share_click',{method:act});
-  if(act==='copy')copy(`${result}\n${pageUrl()}\n#DOPASHARP #도파샾`,'결과를 복사했어요.');
+  if(act==='copy')copy(`${result}\n${pageUrl()}\n#도파샵 #dopashap`,'결과를 복사했어요.');
   else if(act==='link')share({title:name,url:pageUrl()},'링크를 복사했어요.');
   else share({title:name,text:`${result}\n이 기록, 깰 수 있을까요?`,url:pageUrl()},'도전 메시지를 복사했어요.');
  };

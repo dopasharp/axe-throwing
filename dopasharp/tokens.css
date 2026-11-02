@@ -1,4 +1,4 @@
-/* DOPA# design tokens v1.1 — identical in every DOPASHARP repo.
+/* 도파# design tokens v1.1 — identical in every dopa.shap repo.
    Change brand values here only; never hard-code them in a game.
    Font: load Pretendard Variable in the page <head> (see README); system sans-serif is the fallback. */
 :root{

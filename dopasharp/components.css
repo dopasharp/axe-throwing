@@ -1,4 +1,4 @@
-/* DOPA# shared components v1.1 — identical in every DOPASHARP repo. Needs tokens.css.
+/* 도파# shared components v1.1 — identical in every dopa.shap repo. Needs tokens.css.
    Only the brand frame is styled here (header, buttons, game cards, result sheet, footer);
    each game keeps its own colors for the play screen. Everything is scoped to .dopa-* classes. */
 
