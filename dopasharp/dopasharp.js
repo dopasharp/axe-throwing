@@ -1,4 +1,4 @@
-/* 도파# shared brand frame v1.2 — identical in every dopa.shap repo. Needs tokens.css + components.css.
+/* 도파# shared brand frame v1.3 — identical in every dopa.shap repo. Needs tokens.css + components.css.
    A page names itself with <meta name="dopasharp:game" content="soju-game">, then:
    - <header data-dopa="header"></header>  → D# logo · GAME 00N / CODE · "다른 게임 보기"
    - <footer data-dopa="footer"></footer>  → MADE BY 도파#
@@ -6,26 +6,16 @@
    - DopaSharp.moreGames() or [data-dopa-more] → the games page on the hub (dopasharp.github.io/games/)
    - DopaSharp.track(name, params)         → game_view, game_start, game_complete, game_retry, share_click, more_games_click */
 (function(){
-// Mirrors the hub's list (dopasharp.github.io/games.js): same order, so GAME 00N matches the hub cards.
-// When the hub list changes, update this list and copy this file to every repo.
-const GAMES=[
- {id:'soju-game',    code:'SOJU',    art:'🍶',name:'짠! 소주 따르기'},
- {id:'ppro_game',    code:'PEPERO',  art:'🍫',name:'빼빼로게임'},
- {id:'croc-chomp',   code:'CROC',    art:'🐊',name:'악어 이빨 게임'},
- {id:'hbd-lotto',    code:'LOTTO',   art:'🎟️',name:'생일 복권'},
- {id:'birthday-hoo', code:'BIRTHDAY',art:'🎂',name:'생일 케이크'},
- {id:'axe-throwing', code:'AXE',     art:'🪓',name:'도끼 던지기'},
- {id:'truth-mirror', code:'MIRROR',  art:'🪞',name:'진실의 거울'},
- {id:'gacha-capsule',code:'GACHA',   art:'🎰',name:'랜덤 뽑기'},
- {id:'wish-pond',    code:'WISH',    art:'🪙',name:'소원의 연못'},
- {id:'blink-battle', code:'BLINK',   art:'👁️',name:'눈싸움'},
- {id:'bet-room',     code:'BET',     art:'✉️',name:'내기 보물찾기!'}
-].map((g,i)=>({...g,no:String(i+1).padStart(3,'0'),url:`https://dopasharp.github.io/${g.id}/`}));
+const HUB='https://dopasharp.github.io/';
+// The game list lives only on the hub (dopasharp.github.io/games.js). It is loaded from there, so a game added
+// to the hub gets its GAME 00N / CODE here without touching any game repo. Until it arrives (or if it can't
+// load) the header shows the logo alone.
+let GAMES=[],current=null;
 const LOGO='<svg viewBox="0 0 132 80" fill="currentColor" aria-hidden="true"><g transform="translate(18 0) skewX(-14)"><path fill-rule="evenodd" d="M18 10h25c19 0 30 12 30 30S62 70 43 70H18zm15 13v34h9c10 0 16-6.5 16-17s-6-17-16-17z"/><rect x="83" y="12" width="9" height="56"/><rect x="100" y="12" width="9" height="56"/><rect x="77" y="27" width="38" height="9"/><rect x="77" y="45" width="38" height="9"/></g></svg>';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const meta=document.querySelector('meta[name="dopasharp:game"]');
-const current=GAMES.find(g=>g.id===(meta&&meta.content))||null;
-const gameId=current?current.id:location.pathname;
+const myId=meta&&meta.content||'';
+const gameId=myId||location.pathname;
 const pageUrl=()=>location.origin+location.pathname;
 const logo=`<span class="dopa-logo" role="img" aria-label="도파#">${LOGO}</span>`;
 
@@ -37,12 +27,20 @@ function track(name,params){
  document.dispatchEvent(new CustomEvent('dopasharp:track',{detail:{name,...data}}));
 }
 
-const HUB='https://dopasharp.github.io/';
 // One GA4 setup for every game: load the hub's analytics.js (it does nothing until a GA4 ID is set there).
 if(!document.querySelector('script[src$="/analytics.js"]')){const s=document.createElement('script');s.src=HUB+'analytics.js';s.async=true;document.head.appendChild(s)}
 // Every "other games" entry leads to the hub's games page, which hides the game the player came from.
-const gamesUrl=()=>`${HUB}games/${current?'?from='+encodeURIComponent(current.id):''}`;
-const brandHTML=()=>`<a class="dopa-brand" href="${HUB}" aria-label="도파# 홈">${logo}${current?`<span class="dopa-label">GAME ${current.no} / ${current.code}</span>`:''}</a>`;
+const gamesUrl=()=>`${HUB}games/${myId?'?from='+encodeURIComponent(myId):''}`;
+const labelHTML=()=>current?`<span class="dopa-label">GAME ${current.no} / ${esc(current.code)}</span>`:'';
+const brandHTML=()=>`<a class="dopa-brand" href="${HUB}" aria-label="도파# 홈">${logo}${labelHTML()}</a>`;
+function useGames(list){
+ if(!Array.isArray(list))return;
+ GAMES=list.map((g,i)=>({id:g.id,code:g.code||String(g.id).replace(/[^a-z0-9]/gi,'').toUpperCase(),art:g.emoji,name:g.name,no:String(i+1).padStart(3,'0'),url:`${HUB}${g.id}/`}));
+ current=GAMES.find(g=>g.id===myId)||null;
+ if(current)document.querySelectorAll('.dopa-brand').forEach(a=>{if(!a.querySelector('.dopa-label'))a.insertAdjacentHTML('beforeend',labelHTML())});
+}
+if(window.DOPA_GAMES)useGames(window.DOPA_GAMES);
+else{const s=document.createElement('script');s.src=HUB+'games.js';s.async=true;s.onload=()=>useGames(window.DOPA_GAMES);document.head.appendChild(s)}
 const footerHTML=`<span>MADE BY 도파#</span>`;
 let toastTimer;
 function toast(text){
@@ -107,5 +105,5 @@ function mount(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 
-window.DopaSharp={GAMES,current,showResult,moreGames,close,toast,share,track};
+window.DopaSharp={get GAMES(){return GAMES},get current(){return current},showResult,moreGames,close,toast,share,track};
 })();
